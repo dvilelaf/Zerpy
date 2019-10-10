@@ -123,11 +123,11 @@ class XRPAPI():
         messages = []
         if 'message' in response:
             messages.append(response['message'])
-        if 'name' in response['errors'][0] and \
-            response['errors'][0] not in messages:
+        if 'path' in response['errors'][0]:
+            messages.append(f"{response['errors'][0]['path']}")
+        if 'name' in response['errors'][0]:
             messages.append(f"{response['errors'][0]['name']}")
-        if 'message' in response['errors'][0] and \
-            response['errors'][0]['message'] not in messages:
+        if 'message' in response['errors'][0]:
             messages.append(f"{response['errors'][0]['message']}")
 
         # Ensure quotation mark consistency across errors
