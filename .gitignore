@@ -1,2 +1,4 @@
 
 .secret_config.js
+
+__pycache__/
