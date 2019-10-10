@@ -16,22 +16,32 @@ class ConfigManager:
 
     @classmethod
     def fromFile(cls, fileName: str='.secret_config.js') -> 'ConfigManager':
-        if os.path.isfile(fileName):
-            with open(fileName, 'r') as infile:
-                data = infile.read() \
-                             .replace('\n', '') \
-                             .replace(' ', '') \
-                             .replace('module.exports=', '')
-                data = re.sub(r',}', r'}', data)  # Remove unnecesary commas
-                try:
-                    data = json.loads(data)
-                except json.JSONDecodeError:
-                    sys.exit(f'Error: {fileName} is not a valid json file')
-                if not data['accounts']:
-                    raise ValueError
-                return cls(data['accounts'], data['server'], fileName)
-        else:
-            raise FileNotFoundError
+        if not os.path.isfile(fileName):
+            sys.exit(f'Error: {fileName} does not exist')
+
+        with open(fileName, 'r') as infile:
+            data = infile.read() \
+                         .replace('\n', '') \
+                         .replace(' ', '')
+
+            if re.match(re.compile("^module.exports={.*}$"), data) is None:
+                sys.exit('Error: configuration file must have the format: module.exports = {...}')
+            
+            data = data.replace('module.exports=', '')
+            data = re.sub(r',}', r'}', data)  # Remove unnecesary commas that invalidate json files
+            
+            try:
+                data = json.loads(data)
+            except json.JSONDecodeError:
+                sys.exit(f'Error: {fileName} is not a valid json file')
+            if 'server' not in data or 'accounts' not in data:
+                sys.exit('Error: configuration file must contain "server" and "accounts" entries')
+            for i in data['accounts']:
+                if 'apiKey' not in data['accounts'][i] or \
+                'secret' not in data['accounts'][i]:
+                    sys.exit('Error: all accounts in configuration file must contain "apiKey" and "secret" entries')
+            return cls(data['accounts'], data['server'], fileName)
+
 
     def get_data(self):
         return {'server': self.server,
