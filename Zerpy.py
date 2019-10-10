@@ -1,6 +1,7 @@
 from Controller import Controller
 from ConfigManager import ConfigManager
 import sys
+import argparse
 from PyQt5.QtCore import Qt, QSize, QEvent
 from PyQt5.QtGui import QPalette, QColor, QFont, QIcon
 from PyQt5.QtWidgets import QLabel, QMessageBox, QLineEdit, QWidget, \
@@ -230,7 +231,11 @@ def getPalette():
 
 
 if __name__ == '__main__':
-    cfg = ConfigManager.fromFile()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('configFileName', default='.secret_config.js', nargs='?',
+                        help='Configuration file')
+    args = parser.parse_args()
+    cfg = ConfigManager.fromFile(args.configFileName)
     app = QApplication(sys.argv)
     app.setPalette(getPalette())
     window = MainWindow(cfg)
