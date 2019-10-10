@@ -26,7 +26,9 @@ class ConfigManager:
             raise FileNotFoundError
 
     def get_data(self):
-        return {'server': self.server, 'accounts': self.accounts}
+        return {'server': self.server,
+                'accounts': self.accounts,
+                'fileName': self.fileName}
 
     data = property(get_data)
 
