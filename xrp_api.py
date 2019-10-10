@@ -36,45 +36,45 @@ class XRPAPI():
 
     # Query methods
     def get_account_transactions(self, address: str, ledger_index: int=-1) -> dict:
-        """Get a selection of transactions that affected the specified account."""
+        '''Get a selection of transactions that affected the specified account.'''
         endpoint = ('accounts', address, 'transactions')
         headers = {} if ledger_index == -1 else {'ledger_index': str(ledger_index)}
         return self._call(endpoint=endpoint, headers=headers)
 
     def get_account_info(self, address: str, ledger_index: int=-1) -> dict:
-        """Get information about an account in the XRP Ledger. This includes its
+        '''Get information about an account in the XRP Ledger. This includes its
         settings, activity, and XRP balance. It also includes the sequence number
         of the next valid transaction for this account, which you should use to
         prepare a transaction from this account. By default, this method returns
         data from the 'current' (in-progress) ledger, which may change before validation.
-        """
+        '''
         endpoint = ('accounts', address, 'info')
         headers = {} if ledger_index == -1 else {'ledger_index': str(ledger_index)}
         return self._call(endpoint=endpoint, headers=headers)
 
     def get_account_settings(self, address: str, ledger_index: int=-1) -> dict:
-        """Get an account's settings. These are the settings that can be modified
+        '''Get an account's settings. These are the settings that can be modified
         by the user. By default, this method returns data from the 'current'
         (in-progress) ledger, which may change before validation.
-        """
+        '''
         endpoint = ('accounts', address, 'settings')
         headers = {} if ledger_index == -1 else {'ledger_index': str(ledger_index)}
         return self._call(endpoint=endpoint, headers=headers)
 
     # Transact methods
     def get_transaction(self, transaction_id: str) -> dict:
-        """Look up the status and details of a transaction. By default, this method
+        '''Look up the status and details of a transaction. By default, this method
         only returns data from ledger versions that have been validated by consensus.
-        """
+        '''
         endpoint = ('transactions', transaction_id)
         return self._call(endpoint=endpoint)
 
     def submit_payment(self, source_address: str, destination_address: str,
                        amount: int, api_key: str, submit: bool=True) -> dict:
-        """Sign a payment transaction and submit it to the XRP Ledger network. The
+        '''Sign a payment transaction and submit it to the XRP Ledger network. The
         sending account must match an account address and secret the XRP-API server
         is configured with.
-        """
+        '''
         endpoint = ('payments',)
         headers = {'Content-Type': 'application/json',
                    'Authorization': f'Bearer {api_key}'}
@@ -97,18 +97,18 @@ class XRPAPI():
 
     # Meta methods
     def ping(self):
-        """Ping the server to confirm that it is online."""
+        '''Ping the server to confirm that it is online.'''
         endpoint = ('ping',)
         return self._call(endpoint=endpoint)
 
     def get_server_info(self):
-        """Retrieve information about the current status of the XRP-API Server
+        '''Retrieve information about the current status of the XRP-API Server
         and the rippled server(s) it is connected to.
-        """
+        '''
         endpoint = ('servers', 'info')
         return self._call(endpoint=endpoint)
 
     def get_api_docs(self):
-        """ Return the API specification this server is using."""
+        ''' Return the API specification this server is using.'''
         endpoint = ('apiDocs',)
         return self._call(endpoint=endpoint)
