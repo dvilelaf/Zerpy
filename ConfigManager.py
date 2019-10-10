@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import sys
 
 
 class ConfigManager:
@@ -16,9 +17,15 @@ class ConfigManager:
     def fromFile(cls, fileName: str='.secret_config.js') -> 'ConfigManager':
         if os.path.isfile(fileName):
             with open(fileName, 'r') as infile:
-                data = infile.read().replace('module.exports = ', '')
-                data = re.sub(r'},(\n*\s*})', r'}\1', data)  # Remove unwanted commas
-                data = json.loads(data)
+                data = infile.read() \
+                             .replace('\n', '') \
+                             .replace(' ', '') \
+                             .replace('module.exports=', '')
+                data = re.sub(r',}', r'}', data)  # Remove unnecesary commas
+                try:
+                    data = json.loads(data)
+                except json.JSONDecodeError:
+                    sys.exit(f'Error: {fileName} is not a valid config file')
                 if not data['accounts']:
                     raise ValueError
                 return cls(data['accounts'], data['server'], fileName)
