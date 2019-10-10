@@ -79,7 +79,6 @@ class MainWindow(QWidget):
         self.tableWidget.verticalHeader().setVisible(False)
         self.tableWidget.horizontalHeader().setVisible(False)
         self.tableWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        # self.tableWidget.setRowHeight(10)
         self.tableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self.populateTable()
         monofont = QFont()
@@ -125,7 +124,6 @@ class MainWindow(QWidget):
         sendLayout.addWidget(sendLabelB)
         sendLayout.addWidget(self.sendAddress, 4)
         sendLayout.addWidget(sendButton)
-        # sendLayout.setContentsMargins(0, 10, 0, 10)
 
         # Window layout
         layout = QVBoxLayout()
@@ -219,9 +217,6 @@ def getPalette():
     palette.setColor(QPalette.Link, QColor(42, 130, 218))
     palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
     palette.setColor(QPalette.HighlightedText, Qt.black)
-
-    # palette.setColor(QPalette.ButtonText, Qt.red)
-
     return palette
 
 
