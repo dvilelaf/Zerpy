@@ -112,3 +112,26 @@ class XRPAPI():
         ''' Return the API specification this server is using.'''
         endpoint = ('apiDocs',)
         return self._call(endpoint=endpoint)
+
+    @staticmethod
+    def get_error_message(response: dict) -> str:
+        ''' Get a response error simplified string
+        '''
+        if response['status'] == 'ok':
+            return ''
+
+        messages = []
+        if 'message' in response:
+            messages.append(response['message'])
+        if 'name' in response['errors'][0] and \
+            response['errors'][0] not in messages:
+            messages.append(f"{response['errors'][0]['name']}")
+        if 'message' in response['errors'][0] and \
+            response['errors'][0]['message'] not in messages:
+            messages.append(f"{response['errors'][0]['message']}")
+
+        # Ensure quotation mark consistency across errors
+        messages = [i.replace('"', "'") for i in messages]
+        # Delete  duplicated errors
+        messages = list(set(messages))
+        return ': '.join(messages)
