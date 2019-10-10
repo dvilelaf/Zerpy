@@ -26,7 +26,7 @@ class ConfigManager:
                 try:
                     data = json.loads(data)
                 except json.JSONDecodeError:
-                    sys.exit(f'Error: {fileName} is not a valid config file')
+                    sys.exit(f'Error: {fileName} is not a valid json file')
                 if not data['accounts']:
                     raise ValueError
                 return cls(data['accounts'], data['server'], fileName)
