@@ -9,7 +9,8 @@ from PyQt5.QtWidgets import QLabel, QMessageBox, QLineEdit, QWidget, \
 
 
 class MainWindow(QWidget):
-
+    ''' Main UI Window
+    '''
     def __init__(self, config):
         super().__init__()
         self.controller = Controller(config)

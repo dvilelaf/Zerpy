@@ -2,7 +2,9 @@ from xrp_api import XRPAPI
 import webbrowser
 
 class Controller:
-
+    ''' Controller contains all functions that retrieve info from the XRPL,
+    configuration info and keeps track of the active account in the UI
+    '''
     def __init__(self, config: dict):
         self.config = config
         self.activeAccount = list(self.config.data['accounts'].keys())[0]

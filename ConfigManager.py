@@ -5,7 +5,8 @@ import sys
 
 
 class ConfigManager:
-
+    ''' This class handles the loading and saving of the configuration file
+    '''
     def __init__(self, accounts: dict={},
                  server: str='wss://s.altnet.rippletest.net:51233',
                  fileName: str='.secret_config.js'):
