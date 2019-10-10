@@ -134,10 +134,18 @@ class MainWindow(QWidget):
         self.setLayout(layout)
 
     def refreshUI(self):
-        self.controller.update()
-        self.balaceAmountLabel.setText(f'{self.controller.getBalance()} XRP')
-        self.populateTable()
-
+        result = self.controller.update()
+        if result['status'] == 'ok':
+            self.balaceAmountLabel.setText(f'{self.controller.getBalance()} XRP')
+            self.populateTable()
+        else:
+            confirmAlert = QMessageBox()
+            confirmAlert.setWindowTitle('Something went wrong')
+            confirmAlert.setText(result['message'])
+            confirmAlert.setIcon(QMessageBox.Critical)
+            confirmAlert.setStandardButtons(QMessageBox.Ok)
+            confirmAlert.exec_()
+            
     def on_dropdown_change(self):
         address = str(self.addressDropdown.currentText())
         self.controller.setActiveAccount(address)
@@ -152,14 +160,15 @@ class MainWindow(QWidget):
         result = confirmAlert.exec_()
 
         if result == QMessageBox.Ok:
-            p = self.controller.sendPayment(self.sendAmount.text(), self.sendAddress.text())
+            payment = self.controller.sendPayment(self.sendAmount.text(), self.sendAddress.text())
             alert = QMessageBox()
             alert.setWindowTitle('Send payment')
-            if p['status'] == 'ok':
+            if payment['status'] == 'ok':
                 alert.setText('Payment sent!')
                 alert.setIcon(QMessageBox.Information)
             else:
-                alert.setText('Something went wrong')
+                alert.setWindowTitle('Something went wrong')
+                alert.setText(payment['message'])
                 alert.setIcon(QMessageBox.Critical)
             alert.exec_()
             self.refreshUI()

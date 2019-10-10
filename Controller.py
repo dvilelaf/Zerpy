@@ -14,13 +14,27 @@ class Controller:
     def setActiveAccount(self, account: str):
         self.activeAccount = account
 
-    def update(self):
-        self.transactions = self.api.get_account_transactions(self.activeAccount)
+    def update(self) -> dict:
         self.account_info = self.api.get_account_info(self.activeAccount)
+        self.transactions = self.api.get_account_transactions(self.activeAccount)
+
+        result = {'status': 'ok'}
+        for data in [self.account_info, self.transactions]:
+            if data['status'] == 'error':
+                result['status'] = 'error'
+                result['message'] = self.api.get_error_message(data)
+        return result
 
     def sendPayment(self, amount: float, destination_account: str) -> dict:
         api_key = self.config.data['accounts'][self.activeAccount]['apiKey']
-        return self.api.submit_payment(self.activeAccount, destination_account, amount, api_key)
+        payment = self.api.submit_payment(self.activeAccount, 
+                                          destination_account, 
+                                          amount, api_key)
+        result = {'status': 'ok'}
+        if payment['status'] == 'error':
+            result['status'] = 'error'
+            result['message'] = self.api.get_error_message(payment)
+        return result     
 
     def getBalance(self):
         balance = float(self.account_info['account_data']['Balance'])
