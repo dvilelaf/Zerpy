@@ -10,9 +10,17 @@ from PyQt5.QtWidgets import QLabel, QMessageBox, QLineEdit, QWidget, \
                             QTableWidget, QHeaderView, QTableWidgetItem, QMenu, QApplication
 
 
+hex_colors = {'grey': '#353535',
+              'green': '#c4df9b',
+              'red': '#f6989d',
+              'blue': '#0086b3'}
+
+
 class MainWindow(QWidget):
     ''' Main UI Window
     '''
+    sendButtonEnableConditions = [False, False]
+
     def __init__(self, config):
         super().__init__()
         self.controller = Controller(config)
@@ -105,6 +113,7 @@ class MainWindow(QWidget):
         self.sendAmount.setValidator(validator)
         self.sendAmount.textChanged.connect(self.check_state)
         self.sendAmount.textChanged.emit(self.sendAmount.text())
+        self.sendAmount.textChanged.connect(lambda: self.on_text_changed(0))
 
         # Send label B
         sendLabelB = QLabel('XRP to')
@@ -118,14 +127,16 @@ class MainWindow(QWidget):
         self.sendAddress.setValidator(validator)
         self.sendAddress.textChanged.connect(self.check_state)
         self.sendAddress.textChanged.emit(self.sendAmount.text())
+        self.sendAddress.textChanged.connect(lambda: self.on_text_changed(1))
 
         # Send button
-        sendButton = QPushButton()
-        sendButton.setMaximumSize(40, 40)
+        self.sendButton = QPushButton()
+        self.sendButton.setMaximumSize(40, 40)
         sendIcon = QIcon.fromTheme("mail-send")
-        sendButton.setIcon(sendIcon)
-        sendButton.setIconSize(QSize(24,24))
-        sendButton.clicked.connect(self.on_send_clicked)
+        self.sendButton.setIcon(sendIcon)
+        self.sendButton.setIconSize(QSize(24,24))
+        self.sendButton.clicked.connect(self.on_send_clicked)
+        self.sendButton.setEnabled(False)
 
         # Send layout
         sendLayout = QHBoxLayout()
@@ -133,7 +144,7 @@ class MainWindow(QWidget):
         sendLayout.addWidget(self.sendAmount, 2)
         sendLayout.addWidget(sendLabelB)
         sendLayout.addWidget(self.sendAddress, 4)
-        sendLayout.addWidget(sendButton)
+        sendLayout.addWidget(self.sendButton)
 
         # Window layout
         layout = QVBoxLayout()
@@ -225,10 +236,28 @@ class MainWindow(QWidget):
         validator = sender.validator()
         state = validator.validate(sender.text(), 0)[0]
         if state == QValidator.Acceptable:
-            color = '#c4df9b' # green
+            color = hex_colors['green']
         else:
-            color = '#f6989d' # red
+            color = hex_colors['red']
         sender.setStyleSheet('QLineEdit { color: %s }' % color)
+
+
+    def on_text_changed(self, i: int):
+        sender = self.sender()
+        validator = sender.validator()
+        state = validator.validate(sender.text(), 0)[0]
+        if state == QValidator.Acceptable:
+            self.sendButtonEnableConditions[i] = True
+        else:
+            self.sendButtonEnableConditions[i] = False
+
+        if False not in self.sendButtonEnableConditions:
+            self.sendButton.setEnabled(True)
+            self.sendButton.setStyleSheet(f"background-color: {hex_colors['blue']}")
+        else:
+            self.sendButton.setEnabled(False)
+            self.sendButton.setStyleSheet(f"background-color: {hex_colors['grey']}")
+
 
 
 def getPalette():
