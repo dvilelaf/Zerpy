@@ -181,7 +181,7 @@ class MainWindow(QWidget):
             confirmAlert.setIcon(QMessageBox.Critical)
             confirmAlert.setStandardButtons(QMessageBox.Ok)
             confirmAlert.exec_()
-            
+
     def on_dropdown_change(self):
         address = str(self.addressDropdown.currentText())
         self.controller.setActiveAccount(address)
@@ -199,7 +199,7 @@ class MainWindow(QWidget):
         result = confirmAlert.exec_()
 
         if result == QMessageBox.Ok:
-            payment = self.controller.sendPayment(self.sendAmount.text(), 
+            payment = self.controller.sendPayment(self.sendAmount.text(),
                                                   self.sendAddress.text(),
                                                   self.sendTag.text())
             alert = QMessageBox()
@@ -276,7 +276,7 @@ class MainWindow(QWidget):
             self.sendButtonEnableConditions[i] = True
         else:
             self.sendButtonEnableConditions[i] = False
-        
+
         if False not in self.sendButtonEnableConditions:
             self.sendButton.setEnabled(True)
             self.sendButton.setStyleSheet(f"background-color: {hex_colors['blue']}")
