@@ -25,11 +25,12 @@ class Controller:
                 result['message'] = self.api.get_error_message(data)
         return result
 
-    def sendPayment(self, amount: float, destination_account: str) -> dict:
+    def sendPayment(self, amount: float, destination_account: str, destination_tag: str) -> dict:
         api_key = self.config.data['accounts'][self.activeAccount]['apiKey']
-        payment = self.api.submit_payment(self.activeAccount, 
-                                          destination_account, 
-                                          amount, api_key)
+        payment = self.api.submit_payment(source_address=self.activeAccount, 
+                                          destination_address=destination_account, 
+                                          destination_tag=destination_tag,
+                                          amount=amount, api_key=api_key)
         result = {'status': 'ok'}
         if payment['status'] == 'error':
             result['status'] = 'error'

@@ -13,7 +13,8 @@ from PyQt5.QtWidgets import QLabel, QMessageBox, QLineEdit, QWidget, \
 hex_colors = {'grey': '#353535',
               'green': '#c4df9b',
               'red': '#f6989d',
-              'blue': '#0066cc'}
+              'blue': '#0066cc',
+              'white95': '#f2f2f2'}
 
 
 class MainWindow(QWidget):
@@ -109,6 +110,7 @@ class MainWindow(QWidget):
         self.sendAmount = QLineEdit()
         self.sendAmount.setAlignment(Qt.AlignCenter)
         self.sendAmount.setFont(monofont)
+        self.sendAmount.setPlaceholderText('Amount')
         validator = QRegExpValidator(QRegExp('^[0-9]+\.?[0-9]{0,6}$'))
         self.sendAmount.setValidator(validator)
         self.sendAmount.textChanged.connect(self.check_state)
@@ -123,11 +125,23 @@ class MainWindow(QWidget):
         self.sendAddress = QLineEdit()
         self.sendAddress.setAlignment(Qt.AlignCenter)
         self.sendAddress.setFont(monofont)
+        self.sendAddress.setPlaceholderText('Address')
         validator = QRegExpValidator(QRegExp('^r[A-HJ-NP-Za-km-z1-9]{24,34}$'))
         self.sendAddress.setValidator(validator)
         self.sendAddress.textChanged.connect(self.check_state)
         self.sendAddress.textChanged.emit(self.sendAmount.text())
         self.sendAddress.textChanged.connect(lambda: self.on_text_changed(1))
+
+        # Send tag
+        self.sendTag = QLineEdit()
+        self.sendTag.setAlignment(Qt.AlignCenter)
+        self.sendTag.setFont(monofont)
+        self.sendTag.setPlaceholderText('Tag')
+        validator = QRegExpValidator(QRegExp('^\d*$'))
+        self.sendTag.setValidator(validator)
+        self.sendTag.textChanged.connect(self.check_state)
+        # self.sendTag.textChanged.emit(self.sendTag.text())
+        # self.sendTag.textChanged.connect(lambda: self.on_text_changed(2))
 
         # Send button
         self.sendButton = QPushButton()
@@ -144,6 +158,7 @@ class MainWindow(QWidget):
         sendLayout.addWidget(self.sendAmount, 2)
         sendLayout.addWidget(sendLabelB)
         sendLayout.addWidget(self.sendAddress, 4)
+        sendLayout.addWidget(self.sendTag, 1)
         sendLayout.addWidget(self.sendButton)
 
         # Window layout
@@ -175,18 +190,26 @@ class MainWindow(QWidget):
     def on_send_clicked(self):
         confirmAlert = QMessageBox()
         confirmAlert.setWindowTitle('Send payment')
-        confirmAlert.setText(f'You are about to send {self.sendAmount.text()} XRP to\n{self.sendAddress.text()}\nContinue?')
+        confirmAlert.setText(f'You are about to send {self.sendAmount.text()} XRP to:\n'
+                             f'Address: {self.sendAddress.text()}\n'
+                             f'Destination tag: {self.sendTag.text() if self.sendTag.text() else "None"}\n'
+                              'Continue?')
         confirmAlert.setIcon(QMessageBox.Warning)
         confirmAlert.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
         result = confirmAlert.exec_()
 
         if result == QMessageBox.Ok:
-            payment = self.controller.sendPayment(self.sendAmount.text(), self.sendAddress.text())
+            payment = self.controller.sendPayment(self.sendAmount.text(), 
+                                                  self.sendAddress.text(),
+                                                  self.sendTag.text())
             alert = QMessageBox()
             alert.setWindowTitle('Send payment')
             if payment['status'] == 'ok':
                 alert.setText('Payment sent!')
                 alert.setIcon(QMessageBox.Information)
+                self.sendAmount.setText('')
+                self.sendAddress.setText('')
+                self.sendTag.setText('')
             else:
                 alert.setWindowTitle('Something went wrong')
                 alert.setText(payment['message'])
@@ -235,10 +258,13 @@ class MainWindow(QWidget):
         sender = self.sender()
         validator = sender.validator()
         state = validator.validate(sender.text(), 0)[0]
-        if state == QValidator.Acceptable:
-            color = hex_colors['green']
+        if not sender.text():
+            color = hex_colors['white95']
         else:
-            color = hex_colors['red']
+            if state == QValidator.Acceptable:
+                color = hex_colors['green']
+            else:
+                color = hex_colors['red']
         sender.setStyleSheet('QLineEdit { color: %s }' % color)
 
 
@@ -250,7 +276,7 @@ class MainWindow(QWidget):
             self.sendButtonEnableConditions[i] = True
         else:
             self.sendButtonEnableConditions[i] = False
-
+        
         if False not in self.sendButtonEnableConditions:
             self.sendButton.setEnabled(True)
             self.sendButton.setStyleSheet(f"background-color: {hex_colors['blue']}")
