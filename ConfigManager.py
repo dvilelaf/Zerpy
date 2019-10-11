@@ -21,15 +21,13 @@ class ConfigManager:
 
         with open(fileName, 'r') as infile:
             data = infile.read() \
-                         .replace('\n', '') \
-                         .replace(' ', '')
+                         .replace('\n', '')
 
-            if re.match(re.compile("^module.exports={.*}$"), data) is None:
+            if re.match(re.compile("^module.exports = {.*}$"), data) is None:
                 sys.exit('Error: configuration file must have the format: module.exports = {...}')
-            
-            data = data.replace('module.exports=', '')
-            data = re.sub(r',}', r'}', data)  # Remove unnecesary commas that invalidate json files
-            
+
+            data = data.replace('module.exports = ', '')
+            data = re.sub(r',(\s*)}', r'\1}', data)  # Remove unnecesary commas that invalidate json files
             try:
                 data = json.loads(data)
             except json.JSONDecodeError:
