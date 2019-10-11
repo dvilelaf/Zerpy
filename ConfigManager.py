@@ -17,7 +17,7 @@ class ConfigManager:
     @classmethod
     def fromFile(cls, fileName: str='.secret_config.js') -> 'ConfigManager':
         if not os.path.isfile(fileName):
-            sys.exit(f'Error: {fileName} does not exist')
+            sys.exit(f'Error: {fileName} is not a file')
 
         with open(fileName, 'r') as infile:
             data = infile.read() \
