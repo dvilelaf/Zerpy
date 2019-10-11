@@ -1,5 +1,6 @@
 import json
 import requests
+import sys
 
 
 class XRPAPI():
@@ -7,6 +8,15 @@ class XRPAPI():
     def __init__(self, node: str='http://localhost:3000', api_version: int=1):
         self.node = node
         self.api_version = api_version
+        # Check connection and XRP-API server
+        try:
+            response = requests.get('https://www.google.com/', timeout=2)
+        except requests.exceptions.RequestException:
+            sys.exit('Error: no Internet connection available')
+        response = self.ping()
+        if 'error' in response:
+            print('Error: XRP-API server is not running')
+            sys.exit(f'{response["error"]}')
 
     def _call(self, endpoint: tuple, payload: dict={},
               headers: dict={}, method: str='GET') -> dict:
