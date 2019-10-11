@@ -2,8 +2,9 @@ from Controller import Controller
 from ConfigManager import ConfigManager
 import sys
 import argparse
-from PyQt5.QtCore import Qt, QSize, QEvent
-from PyQt5.QtGui import QPalette, QColor, QFont, QIcon
+from PyQt5.QtCore import Qt, QSize, QRegExp
+from PyQt5.QtGui import QPalette, QColor, QFont, QIcon, \
+                        QValidator, QDoubleValidator, QRegExpValidator
 from PyQt5.QtWidgets import QLabel, QMessageBox, QLineEdit, QWidget, \
                             QPushButton, QVBoxLayout, QHBoxLayout, QComboBox, \
                             QTableWidget, QHeaderView, QTableWidgetItem, QMenu, QApplication
@@ -100,6 +101,10 @@ class MainWindow(QWidget):
         self.sendAmount = QLineEdit()
         self.sendAmount.setAlignment(Qt.AlignCenter)
         self.sendAmount.setFont(monofont)
+        validator = QRegExpValidator(QRegExp('^[0-9]+\.?[0-9]{0,6}$'))
+        self.sendAmount.setValidator(validator)
+        self.sendAmount.textChanged.connect(self.check_state)
+        self.sendAmount.textChanged.emit(self.sendAmount.text())
 
         # Send label B
         sendLabelB = QLabel('XRP to')
@@ -109,6 +114,10 @@ class MainWindow(QWidget):
         self.sendAddress = QLineEdit()
         self.sendAddress.setAlignment(Qt.AlignCenter)
         self.sendAddress.setFont(monofont)
+        validator = QRegExpValidator(QRegExp('^r[A-HJ-NP-Za-km-z1-9]{24,34}$'))
+        self.sendAddress.setValidator(validator)
+        self.sendAddress.textChanged.connect(self.check_state)
+        self.sendAddress.textChanged.emit(self.sendAmount.text())
 
         # Send button
         sendButton = QPushButton()
@@ -210,6 +219,16 @@ class MainWindow(QWidget):
         elif action == copyIDAction:
             txID = self.controller.getTxIDByIndex(row)
             QApplication.clipboard().setText(txID)
+
+    def check_state(self, *args, **kwargs):
+        sender = self.sender()
+        validator = sender.validator()
+        state = validator.validate(sender.text(), 0)[0]
+        if state == QValidator.Acceptable:
+            color = '#c4df9b' # green
+        else:
+            color = '#f6989d' # red
+        sender.setStyleSheet('QLineEdit { color: %s }' % color)
 
 
 def getPalette():
