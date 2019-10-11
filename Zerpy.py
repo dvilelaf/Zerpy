@@ -93,7 +93,7 @@ class MainWindow(QWidget):
         self.tableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self.populateTable()
         monofont = QFont()
-        monofont.setFamily("Courier New");
+        monofont.setFamily("Courier New")
         monofont.setPointSize(10)
         self.tableWidget.setFont(monofont)
 
