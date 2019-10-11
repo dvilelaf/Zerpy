@@ -38,7 +38,7 @@ class Controller:
 
     def getBalance(self):
         balance = float(self.account_info['account_data']['Balance'])
-        return f'{balance / 1e6:.2f}'
+        return f'{balance / 1e6:.6f}'
 
     def getFormattedTransactions(self):
         data = []
@@ -55,7 +55,7 @@ class Controller:
                     icon = '\N{downwards black arrow}'
                     address = tx['specification']['source']['address']
 
-                data.append(f'{icon} {amount: >+12.2f} XRP      {address}      {timeStamp}')
+                data.append(f'{icon} {amount: >+16.6f} XRP      {address}      {timeStamp}')
 
         return data
 

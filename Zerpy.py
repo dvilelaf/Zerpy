@@ -21,7 +21,7 @@ class MainWindow(QWidget):
     def initUI(self):
         # Window size and title
         self.setWindowTitle('Zerpy')
-        self.resize(700, 700)
+        self.resize(750, 700)
         self.setMinimumWidth(700)
 
         # Address label
