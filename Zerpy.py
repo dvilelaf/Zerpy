@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QLabel, QMessageBox, QLineEdit, QWidget, \
 hex_colors = {'grey': '#353535',
               'green': '#c4df9b',
               'red': '#f6989d',
-              'blue': '#0086b3'}
+              'blue': '#0066cc'}
 
 
 class MainWindow(QWidget):
