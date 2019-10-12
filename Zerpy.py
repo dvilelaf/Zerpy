@@ -90,6 +90,7 @@ class MainWindow(QWidget):
         # Transactions label
         transactionsLabel = QLabel('Transactions')
         transactionsLabel.setAlignment(Qt.AlignCenter)
+        transactionsLabel.setContentsMargins(0, 0, 0, 10)
 
         # Transactions table
         self.tableWidget = QTableWidget()
@@ -108,6 +109,7 @@ class MainWindow(QWidget):
         transactionsLayout = QVBoxLayout()
         transactionsLayout.addWidget(transactionsLabel)
         transactionsLayout.addWidget(self.tableWidget)
+        transactionsLayout.setContentsMargins(0, 0, 0, 0)
 
         # Send label A
         sendLabelA = QLabel('Send')
@@ -165,6 +167,7 @@ class MainWindow(QWidget):
         sendLayout.addWidget(self.sendAddress, 4)
         sendLayout.addWidget(self.sendTag, 1)
         sendLayout.addWidget(self.sendButton)
+        sendLayout.setContentsMargins(0, 0, 0, 0)
 
         # Info layout
         balanceWidget = QWidget()
