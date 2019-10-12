@@ -55,11 +55,11 @@ class Controller:
                 localTimeStamp = UTCtimeStamp.astimezone(tz.tzlocal())
                 timeStampStr = localTimeStamp.strftime('%Y-%m-%d %H:%M:%S')
                 if tx['specification']['source']['address'] == self.activeAccount:
-                    icon = '\N{upwards black arrow}'
+                    icon = '\N{Wide-Headed Upwards Heavy Barb Arrow}'
                     address = tx['specification']['destination']['address']
                     amount = -amount
                 else:
-                    icon = '\N{downwards black arrow}'
+                    icon = '\N{Wide-Headed Downwards Heavy Barb Arrow}'
                     address = tx['specification']['source']['address']
 
                 data.append(f'{icon} {amount: >+16.6f} XRP      {address}      {timeStampStr}')
