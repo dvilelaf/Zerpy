@@ -17,16 +17,9 @@ class Controller:
     def setActiveAccount(self, account: str):
         self.activeAccount = account
 
-    def update(self) -> dict:
+    def update(self):
         self.account_info = self.api.get_account_info(self.activeAccount)
         self.transactions = self.api.get_account_transactions(self.activeAccount)
-
-        result = {'status': 'ok'}
-        for data in [self.account_info, self.transactions]:
-            if data['status'] == 'error':
-                result['status'] = 'error'
-                result['message'] = self.api.get_error_message(data)
-        return result
 
     def sendPayment(self, amount: float, destination_account: str, destination_tag: str) -> dict:
         api_key = self.config.data['accounts'][self.activeAccount]['apiKey']

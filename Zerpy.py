@@ -1,14 +1,15 @@
 from Controller import Controller
 from ConfigManager import ConfigManager
 import sys
+import threading
 import re
 import argparse
-from PyQt5.QtCore import Qt, QSize, QRegExp
-from PyQt5.QtGui import QPalette, QColor, QFont, QIcon, \
-                        QValidator, QRegExpValidator
-from PyQt5.QtWidgets import QLabel, QMessageBox, QLineEdit, QWidget, \
-                            QPushButton, QVBoxLayout, QHBoxLayout, QComboBox, \
-                            QTableWidget, QHeaderView, QTableWidgetItem, QMenu, QApplication
+from pyqtspinner.spinner import WaitingSpinner
+from PyQt5.QtCore import Qt, QSize, QRegExp, pyqtSignal
+from PyQt5.QtGui import QPalette, QColor, QFont, QIcon, QValidator, QRegExpValidator
+from PyQt5.QtWidgets import (QLabel, QMessageBox, QLineEdit, QWidget, QStackedWidget,
+                            QPushButton, QVBoxLayout, QHBoxLayout, QComboBox,
+                            QTableWidget, QHeaderView, QTableWidgetItem, QMenu, QApplication)
 
 
 hex_colors = {'grey': '#353535',
@@ -22,6 +23,8 @@ class MainWindow(QWidget):
     ''' Main UI Window
     '''
     sendButtonEnableConditions = [False, False]
+    spinner = None
+    newData = pyqtSignal()
 
     def __init__(self, config):
         super().__init__()
@@ -51,19 +54,19 @@ class MainWindow(QWidget):
         self.addressDropdown.customContextMenuRequested.connect(self.on_dropdown_context_menu)
 
         # Refresh button
-        refreshButton = QPushButton()
-        refreshButton.setMaximumSize(40, 40)
+        self.refreshButton = QPushButton()
+        self.refreshButton.setMaximumSize(40, 40)
         refreshIcon = QIcon.fromTheme("view-refresh")
-        refreshButton.setIcon(refreshIcon)
-        refreshButton.setIconSize(QSize(24,24))
-        refreshButton.clicked.connect(self.refreshUI)
-        refreshButton.setToolTip('Refresh balance and transactions')
+        self.refreshButton.setIcon(refreshIcon)
+        self.refreshButton.setIconSize(QSize(24,24))
+        self.refreshButton.clicked.connect(self.refreshData)
+        self.refreshButton.setToolTip('Refresh balance and transactions')
 
         # Address layout
-        addressayout = QHBoxLayout()
-        addressayout.addWidget(addressLabel, 1)
-        addressayout.addWidget(self.addressDropdown, 7)
-        addressayout.addWidget(refreshButton)
+        addressLayout = QHBoxLayout()
+        addressLayout.addWidget(addressLabel, 1)
+        addressLayout.addWidget(self.addressDropdown, 7)
+        addressLayout.addWidget(self.refreshButton)
 
         # Balance label
         balaceLabel = QLabel()
@@ -165,16 +168,59 @@ class MainWindow(QWidget):
         sendLayout.addWidget(self.sendTag, 1)
         sendLayout.addWidget(self.sendButton)
 
-        # Window layout
-        layout = QVBoxLayout()
-        layout.addLayout(addressayout)
-        layout.addLayout(balanceLayout)
-        layout.addLayout(transactionsLayout)
-        layout.addLayout(sendLayout)
-        self.setLayout(layout)
+        # Info layout
+        balanceWidget = QWidget()
+        balanceWidget.setLayout(balanceLayout)
+        transactionsWidget = QWidget()
+        transactionsWidget.setLayout(transactionsLayout)
+        sendWidget = QWidget()
+        sendWidget.setLayout(sendLayout)
 
-    def refreshUI(self):
-        result = self.controller.update()
+        self.infoLayout = QVBoxLayout()
+        self.infoLayout.setContentsMargins(0, 0, 0, 0)
+        self.infoLayout.addWidget(balanceWidget)
+        self.infoLayout.addWidget(transactionsWidget)
+        self.infoLayout.addWidget(sendWidget)
+
+        # Waiting spinner
+        self.spinner = WaitingSpinner(self)
+        self.spinnerLayout = QVBoxLayout()
+        self.spinnerLayout.addWidget(self.spinner)
+        self.spinner.start()
+
+        # Stacked widget
+        infoWidget = QWidget()
+        infoWidget.setLayout(self.infoLayout)
+
+        spinnerWidget = QWidget()
+        spinnerWidget.setLayout(self.spinnerLayout)
+
+        self.stackedWidget = QStackedWidget()
+        self.stackedWidget.setContentsMargins(0, 0, 0, 0)
+        self.stackedWidget.addWidget(infoWidget)
+        self.stackedWidget.addWidget(spinnerWidget)
+        self.stackedWidget.setCurrentIndex(0)
+
+        # Window layout
+        windowLayout = QVBoxLayout()
+        windowLayout.addLayout(addressLayout)
+        windowLayout.addWidget(self.stackedWidget)
+        self.setLayout(windowLayout)
+
+        # New data signal
+        self.newData.connect(self.onNewData)
+        self.newData.connect(self.switchWidget)
+        self.newData.connect(lambda: self.refreshButton.setDisabled(False))
+        self.newData.connect(lambda: self.addressDropdown.setDisabled(False))
+
+    def onNewData(self):
+        result = {'status': 'ok'}
+        for data in [self.controller.account_info, self.controller.transactions]:
+            if data['status'] == 'error':
+                result['status'] = 'error'
+                result['message'] = self.api.get_error_message(data)
+                break
+
         if result['status'] == 'ok':
             self.balaceAmountLabel.setText(f'{self.controller.getBalance()} XRP')
             self.populateTable()
@@ -186,11 +232,27 @@ class MainWindow(QWidget):
             confirmAlert.setStandardButtons(QMessageBox.Ok)
             confirmAlert.exec_()
 
+    def update(self):
+        self.controller.update()
+        self.newData.emit()
+
+    def refreshData(self):
+        self.refreshButton.setDisabled(True)
+        self.addressDropdown.setDisabled(True)
+        self.switchWidget()
+        threading.Thread(target=self.update, daemon=True).start()
+
+    def switchWidget(self):
+        if self.stackedWidget.currentIndex() == 0:
+            self.stackedWidget.setCurrentIndex(1)
+        else:
+            self.stackedWidget.setCurrentIndex(0)
+
     def on_dropdown_change(self):
         address = str(self.addressDropdown.currentText())
         address = re.sub(r'\s*\(.*\)', '', address)  # Remove alias
         self.controller.setActiveAccount(address)
-        self.refreshUI()
+        self.refreshData()
 
     def on_send_clicked(self):
         confirmAlert = QMessageBox()
@@ -220,7 +282,7 @@ class MainWindow(QWidget):
                 alert.setText(payment['message'])
                 alert.setIcon(QMessageBox.Critical)
             alert.exec_()
-            self.refreshUI()
+            self.refreshData()
 
     def populateTable(self):
         txs = self.controller.getFormattedTransactions()
