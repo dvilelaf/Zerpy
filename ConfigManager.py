@@ -2,6 +2,7 @@ import json
 import os
 import re
 import sys
+from MessageBox import showMessageBox
 
 
 class ConfigManager:
@@ -17,27 +18,37 @@ class ConfigManager:
     @classmethod
     def fromFile(cls, fileName: str='.secret_config.js') -> 'ConfigManager':
         if not os.path.isfile(fileName):
-            sys.exit(f'Error: {fileName} is not a file')
+            message = f'Configuration file "{fileName}" is not a file.'
+            showMessageBox('Error', message, 'critical')
+            sys.exit('Error: ' + message)
 
         with open(fileName, 'r') as infile:
             data = infile.read() \
                          .replace('\n', '')
 
             if re.match(re.compile("^module.exports = {.*}$"), data) is None:
-                sys.exit('Error: configuration file must have the format: module.exports = {...}')
+                message = 'Configuration file must have the format: module.exports = {...}.'
+                showMessageBox('Error', message, 'critical')
+                sys.exit('Error: ' + message)
 
             data = data.replace('module.exports = ', '')
             data = re.sub(r',(\s*)}', r'\1}', data)  # Remove unnecesary commas that invalidate json files
             try:
                 data = json.loads(data)
             except json.JSONDecodeError:
-                sys.exit(f'Error: {fileName} is not a valid json file')
+                message = f'Configuration file "{fileName}" is not a valid json file.'
+                showMessageBox('Error', message, 'critical')
+                sys.exit('Error: ' + message)
             if 'server' not in data or 'accounts' not in data:
-                sys.exit('Error: configuration file must contain "server" and "accounts" entries')
+                message = f'Configuration file "{fileName}" must contain "server" and "accounts" entries.'
+                showMessageBox('Error', message, 'critical')
+                sys.exit('Error: ' + message)
             for i in data['accounts']:
                 if 'apiKey' not in data['accounts'][i] or \
                 'secret' not in data['accounts'][i]:
-                    sys.exit('Error: all accounts in configuration file must contain "apiKey" and "secret" entries')
+                    message = f'All accounts in configuration file "{fileName}" must contain "apiKey" and "secret" entries'
+                    showMessageBox('Error', message, 'critical')
+                    sys.exit('Error: ' + message)
             return cls(data['accounts'], data['server'], fileName)
 
 
