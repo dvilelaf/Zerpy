@@ -118,7 +118,7 @@ class MainWindow(QWidget):
         self.sendAmount.setAlignment(Qt.AlignCenter)
         self.sendAmount.setFont(monofont)
         self.sendAmount.setPlaceholderText('Amount')
-        validator = QRegExpValidator(QRegExp('^[0-9]+\.?[0-9]{0,6}$'))
+        validator = QRegExpValidator(QRegExp(r'^[0-9]+\.?[0-9]{0,6}$'))
         self.sendAmount.setValidator(validator)
         self.sendAmount.textChanged.connect(self.check_state)
         self.sendAmount.textChanged.emit(self.sendAmount.text())
@@ -144,11 +144,9 @@ class MainWindow(QWidget):
         self.sendTag.setAlignment(Qt.AlignCenter)
         self.sendTag.setFont(monofont)
         self.sendTag.setPlaceholderText('Tag')
-        validator = QRegExpValidator(QRegExp('^\d*$'))
+        validator = QRegExpValidator(QRegExp(r'^\d*$'))
         self.sendTag.setValidator(validator)
         self.sendTag.textChanged.connect(self.check_state)
-        # self.sendTag.textChanged.emit(self.sendTag.text())
-        # self.sendTag.textChanged.connect(lambda: self.on_text_changed(2))
 
         # Send button
         self.sendButton = QPushButton()
