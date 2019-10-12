@@ -1,5 +1,8 @@
 from xrp_api import XRPAPI
 import webbrowser
+from datetime import datetime
+from dateutil import tz
+
 
 class Controller:
     ''' Controller contains all functions that retrieve info from the XRPL,
@@ -46,8 +49,11 @@ class Controller:
         for tx in self.transactions['transactions']:
             if tx['outcome']['result'] == 'tesSUCCESS':
                 amount = float(tx['outcome']['deliveredAmount']['value'])
-                timeStamp = tx['outcome']['timestamp'].replace('.000Z', '').replace('T', ' ')
-
+                UTCtimeStamp = datetime.strptime(tx['outcome']['timestamp'],
+                                                 '%Y-%m-%dT%H:%M:%S.000Z')
+                UTCtimeStamp = UTCtimeStamp.replace(tzinfo=tz.tzutc())
+                localTimeStamp = UTCtimeStamp.astimezone(tz.tzlocal())
+                timeStampStr = localTimeStamp.strftime('%Y-%m-%d %H:%M:%S')
                 if tx['specification']['source']['address'] == self.activeAccount:
                     icon = '\N{upwards black arrow}'
                     address = tx['specification']['destination']['address']
@@ -56,7 +62,7 @@ class Controller:
                     icon = '\N{downwards black arrow}'
                     address = tx['specification']['source']['address']
 
-                data.append(f'{icon} {amount: >+16.6f} XRP      {address}      {timeStamp}')
+                data.append(f'{icon} {amount: >+16.6f} XRP      {address}      {timeStampStr}')
 
         return data
 
