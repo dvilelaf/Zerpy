@@ -5,7 +5,7 @@ import re
 import argparse
 from PyQt5.QtCore import Qt, QSize, QRegExp
 from PyQt5.QtGui import QPalette, QColor, QFont, QIcon, \
-                        QValidator, QDoubleValidator, QRegExpValidator
+                        QValidator, QRegExpValidator
 from PyQt5.QtWidgets import QLabel, QMessageBox, QLineEdit, QWidget, \
                             QPushButton, QVBoxLayout, QHBoxLayout, QComboBox, \
                             QTableWidget, QHeaderView, QTableWidgetItem, QMenu, QApplication
