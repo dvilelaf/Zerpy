@@ -3,8 +3,11 @@
 Zerpy is a minimal account manager for the XRP ledger. With Zerpy, you can check your
 transactions and send XRP from multiple XRPL addresses.
 
+Warning: Zerpy is in alpha stage. Please use carefully. Use it only with test accounts or low-value
+accounts. Never share your account secret and be careful storing it.
+
 <p align="center">
-  <img src="https://i.imgur.com/U7mFQLt.png">
+  <img src="https://i.imgur.com/76cM1dX.png">
 </p>
 
 ## Installation
