@@ -1,6 +1,7 @@
 from Controller import Controller
 from ConfigManager import ConfigManager
 import sys
+import re
 import argparse
 from PyQt5.QtCore import Qt, QSize, QRegExp
 from PyQt5.QtGui import QPalette, QColor, QFont, QIcon, \
@@ -40,7 +41,10 @@ class MainWindow(QWidget):
         # Address dropdown
         self.addressDropdown = QComboBox(self)
         for address in self.controller.config.data['accounts']:
-            self.addressDropdown.addItem(address)
+            item = address
+            if 'alias' in self.controller.config.data['accounts'][address]:
+                item += f"  ({self.controller.config.data['accounts'][address]['alias']})"
+            self.addressDropdown.addItem(item)
         self.addressDropdown.setCurrentText(self.controller.activeAccount)
         self.addressDropdown.activated.connect(self.on_dropdown_change)
         self.addressDropdown.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -184,6 +188,7 @@ class MainWindow(QWidget):
 
     def on_dropdown_change(self):
         address = str(self.addressDropdown.currentText())
+        address = re.sub(r'\s*\(.*\)', '', address)  # Remove alias
         self.controller.setActiveAccount(address)
         self.refreshUI()
 
