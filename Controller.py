@@ -1,4 +1,4 @@
-from xrp_api import XRPAPI
+from xrpApiWrapper import XRPAPI
 import webbrowser
 from datetime import datetime
 from dateutil import tz
