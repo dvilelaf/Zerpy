@@ -2,7 +2,11 @@ import json
 import os
 import re
 import sys
-from MessageBox import showMessageBox
+try:
+    from MessageBox import showMessageBox
+    MessageBoxPresent = True
+except ImportError:
+    MessageBoxPresent = False
 
 
 class ConfigManager:
@@ -19,7 +23,8 @@ class ConfigManager:
     def fromFile(cls, fileName: str='.secret_config.js') -> 'ConfigManager':
         if not os.path.isfile(fileName):
             message = f'Configuration file "{fileName}" is not a file.'
-            showMessageBox('Error', message, 'critical')
+            if MessageBoxPresent:
+                showMessageBox('Error', message, 'critical')
             sys.exit('Error: ' + message)
 
         with open(fileName, 'r') as infile:
@@ -28,7 +33,8 @@ class ConfigManager:
 
             if re.match(re.compile("^module.exports = {.*}$"), data) is None:
                 message = 'Configuration file must have the format: module.exports = {...}.'
-                showMessageBox('Error', message, 'critical')
+                if MessageBoxPresent:
+                    showMessageBox('Error', message, 'critical')
                 sys.exit('Error: ' + message)
 
             data = data.replace('module.exports = ', '')
@@ -37,17 +43,20 @@ class ConfigManager:
                 data = json.loads(data)
             except json.JSONDecodeError:
                 message = f'Configuration file "{fileName}" is not a valid json file.'
-                showMessageBox('Error', message, 'critical')
+                if MessageBoxPresent:
+                    showMessageBox('Error', message, 'critical')
                 sys.exit('Error: ' + message)
             if 'server' not in data or 'accounts' not in data:
                 message = f'Configuration file "{fileName}" must contain "server" and "accounts" entries.'
-                showMessageBox('Error', message, 'critical')
+                if MessageBoxPresent:
+                    showMessageBox('Error', message, 'critical')
                 sys.exit('Error: ' + message)
             for i in data['accounts']:
                 if 'apiKey' not in data['accounts'][i] or \
                 'secret' not in data['accounts'][i]:
                     message = f'All accounts in configuration file "{fileName}" must contain "apiKey" and "secret" entries'
-                    showMessageBox('Error', message, 'critical')
+                    if MessageBoxPresent:
+                        showMessageBox('Error', message, 'critical')
                     sys.exit('Error: ' + message)
             return cls(data['accounts'], data['server'], fileName)
 
