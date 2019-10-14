@@ -25,6 +25,7 @@ class Controller:
         api_key = self.config.data['accounts'][self.activeAccount]['apiKey']
         payment = self.api.submit_payment(source_address=self.activeAccount,
                                           destination_address=destination_account,
+                                          source_tag='',
                                           destination_tag=destination_tag,
                                           amount=amount, api_key=api_key)
         result = {'status': 'ok'}
