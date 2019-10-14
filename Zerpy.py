@@ -6,7 +6,7 @@ import re
 import argparse
 from pyqtspinner.spinner import WaitingSpinner
 from PyQt5.QtCore import Qt, QSize, QRegExp, pyqtSignal
-from PyQt5.QtGui import QPalette, QColor, QFont, QIcon, QValidator, QRegExpValidator
+from PyQt5.QtGui import QPalette, QColor, QFont, QIcon, QValidator, QRegExpValidator, QBrush
 from PyQt5.QtWidgets import (QLabel, QMessageBox, QLineEdit, QWidget, QStackedWidget,
                             QPushButton, QVBoxLayout, QHBoxLayout, QComboBox,
                             QTableWidget, QHeaderView, QTableWidgetItem, QMenu, QApplication)
@@ -292,6 +292,12 @@ class MainWindow(QWidget):
 
         for i in range(len(txs)):
             item = QTableWidgetItem(txs[i])
+            if '+' in txs[i]:
+                item.setForeground(QBrush(QColor(hex_colors['green'])))
+            elif '-' in txs[i]:
+                item.setForeground(QBrush(QColor(hex_colors['red'])))
+            else:
+                item.setForeground(QBrush(QColor(hex_colors['white'])))
             item.setTextAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
             self.tableWidget.setItem(i, 0, item)
 
