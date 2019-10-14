@@ -297,7 +297,7 @@ class MainWindow(QWidget):
 
     def on_dropdown_context_menu(self, event):
         menu = QMenu(self)
-        copyAddressAction = menu.addAction('Copy address')
+        copyAddressAction = menu.addAction('Copy account address')
         action = menu.exec_(self.mapToGlobal(event))
 
         if action == copyAddressAction:
@@ -306,8 +306,8 @@ class MainWindow(QWidget):
 
     def contextMenuEvent(self, event):
         menu = QMenu(self)
-        openAction = menu.addAction('Open in browser')
-        copyAddressAction = menu.addAction('Copy address')
+        openAction = menu.addAction('Open transaction in browser')
+        copyAddressAction = menu.addAction('Copy destination address')
         copyIDAction = menu.addAction('Copy transaction ID')
         gp = event.globalPos()
         action = menu.exec_(gp)
