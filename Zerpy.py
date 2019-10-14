@@ -36,6 +36,7 @@ class MainWindow(QWidget):
         self.setWindowTitle('Zerpy')
         self.resize(750, 700)
         self.setMinimumWidth(700)
+        self.setWindowIcon(QIcon('./images/zerpy.png'))
 
         # Address label
         addressLabel = QLabel('Address')
