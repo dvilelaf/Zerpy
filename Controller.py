@@ -2,6 +2,8 @@ from xrpApiWrapper import XRPAPI
 import webbrowser
 from datetime import datetime
 from dateutil import tz
+from MessageBox import showMessageBox
+import sys
 
 
 class Controller:
@@ -12,6 +14,9 @@ class Controller:
         self.config = config
         self.activeAccount = list(self.config.data['accounts'].keys())[0]
         self.api = XRPAPI()
+        if self.api.error:
+            showMessageBox('Error', self.api.errorMessage, 'critical')
+            sys.exit('Error: ' + self.api.errorMessage)
         self.update()
 
     def setActiveAccount(self, account: str):
